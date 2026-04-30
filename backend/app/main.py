@@ -4,10 +4,10 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Setup: We will initialize DB and Redis connections here later
-    print("🚀 System starting up...")
+    print("System starting up...")
     yield
     # Teardown: Close connections here
-    print("🛑 System shutting down...")
+    print("System shutting down...")
 
 app = FastAPI(
     title="Paper Intelligence API",
