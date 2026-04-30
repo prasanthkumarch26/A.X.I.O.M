@@ -1,72 +1,15 @@
 
-# services:
-#   postgres:
-#     image: postgres:15-alpine
-#     container_name: paper_intel_postgres
-#     restart: unless-stopped
-#     environment:
-#       POSTGRES_USER: paper_user
-#       POSTGRES_PASSWORD: paper_pass
-#       POSTGRES_DB: paper_intelligence
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
-#       - ./backend/app/db/migrations/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql
-#     healthcheck:
-#       test: ["CMD-SHELL", "pg_isready -U paper_user -d paper_intelligence"]
-#       interval: 5s
-#       timeout: 5s
-#       retries: 10
-
-#   redis:
-#     image: redis:7-alpine
-#     container_name: paper_intel_redis
-#     restart: unless-stopped
-#     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save ""
-#     ports:
-#       - "6379:6379"
-#     healthcheck:
-#       test: ["CMD", "redis-cli", "ping"]
-#       interval: 5s
-#       timeout: 3s
-#       retries: 10
-
-#   backend:
-#     build:
-#       context: ./backend
-#       dockerfile: Dockerfile
-#     container_name: paper_intel_backend
-#     restart: unless-stopped
-#     environment:
-#       DATABASE_URL: postgresql://paper_user:paper_pass@postgres:5432/paper_intelligence
-#       REDIS_URL: redis://redis:6379/0
-#       ENV: development
-#       LOG_LEVEL: INFO
-#     ports:
-#       - "8000:8000"
-#     depends_on:
-#       postgres:
-#         condition: service_healthy
-#       redis:
-#         condition: service_healthy
-#     volumes:
-#       - ./backend:/app
-#       - ./backend/data:/app/data
-
-# volumes:
-#   postgres_data:
-
-
 version: '3.8'
 
 services:
-  db:
+  postgres:
     image: postgres:15-alpine
+    container_name: paper_intel_postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: paper_db
+      POSTGRES_USER: paper_user
+      POSTGRES_PASSWORD: paper_pass
+      POSTGRES_DB: paper_intelligence
     ports:
       - "5432:5432"
     volumes:
@@ -74,6 +17,9 @@ services:
 
   redis:
     image: redis:7-alpine
+    container_name: paper_intel_redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save ""
     ports:
       - "6379:6379"
 

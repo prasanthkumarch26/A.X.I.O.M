@@ -6,6 +6,7 @@ uvicorn[standard]
 asyncpg
 sqlalchemy
 pgvector
+PyMuPDF
 
 # Caching
 redis
