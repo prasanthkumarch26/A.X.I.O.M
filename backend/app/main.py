@@ -1,13 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from contextlib import asynccontextmanager
+import asyncpg
+
+from app.db.connection import init_db, close_db, get_db
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Setup: We will initialize DB and Redis connections here later
     print("System starting up...")
+    await init_db()
     yield
-    # Teardown: Close connections here
     print("System shutting down...")
+    await close_db()
+
 
 app = FastAPI(
     title="Paper Intelligence API",
@@ -16,7 +21,26 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+
 @app.get("/health")
-async def health_check():
-    """Basic health check endpoint for observability/load balancers."""
-    return {"status": "ok", "service": "paper-intelligence-backend"}
+async def health_check(conn: asyncpg.Connection = Depends(get_db)):
+    try:
+        result = await conn.fetchval("SELECT 1")
+        if result == 1:
+            return {
+                "status": "ok",
+                "service": "paper-intelligence-backend",
+                "db": "connected"
+            }
+        return {
+            "status": "error",
+            "service": "paper-intelligence-backend",
+            "db": "unexpected response"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "service": "paper-intelligence-backend",
+            "db": "disconnected",
+            "error": str(e)
+        }
