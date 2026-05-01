@@ -12,14 +12,14 @@ load_dotenv()
 
 
 BASE_DIR = Path(__file__).resolve().parent
-MIGRATIONS_DIR = BASE_DIR / "app" / "db" / "migrations"
+MIGRATIONS_DIR = BASE_DIR / "db" / "migrations"
 
 if not MIGRATIONS_DIR.exists():
     raise FileNotFoundError(f"Migrations directory not found: {MIGRATIONS_DIR}")
 
 
 def get_database_url():
-    db_url = os.getenv("DATABASE_URL")
+    db_url = os.getenv("APP_DATABASE_URL")
     if not db_url:
         raise ValueError("Error: DATABASE_URL is not set in environment variables")
     return db_url
