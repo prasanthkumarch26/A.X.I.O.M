@@ -135,12 +135,9 @@ async def apply_migration(conn, version: str, sql: str):
     print(f"Success: Applied migration: {version}")
 
 
-lock_acquired = False
-
-
 async def run_migration():
     conn = await connect()
-
+    lock_acquired = False
     try:
         await acquire_lock(conn)
         lock_acquired = True
