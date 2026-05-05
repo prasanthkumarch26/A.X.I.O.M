@@ -21,7 +21,7 @@ async def insert_paper(conn: asyncpg.Connection, paper: Dict[str, Any]) -> int:
         paper["pdf_url"],
         paper["published_date"],
         paper["updated_date"],
-        paper.get("metadata", {}),
+        paper.get("metadata"),
     )
 
 async def insert_paper_chunk(conn: asyncpg.Connection, chunk: Dict[str, Any]) -> int:
