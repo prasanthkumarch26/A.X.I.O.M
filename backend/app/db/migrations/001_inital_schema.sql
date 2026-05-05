@@ -7,8 +7,10 @@ CREATE TABLE IF NOT EXISTS papers (
     title TEXT NOT NULL,
     abstract TEXT NOT NULL,
     authors TEXT[],
-    published_date DATE,
+    arxiv_url TEXT NOT NULL,
     pdf_url TEXT NOT NULL,
+    published_date TEXT,
+    updated_date TEXT,
     metadata JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

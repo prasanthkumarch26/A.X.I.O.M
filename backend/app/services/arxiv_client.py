@@ -11,14 +11,14 @@ class ArxivClient:
         entries = []
         for entry in root.findall("{http://www.w3.org/2005/Atom}entry"):
             entry_dict = {
-                "id": entry.find("{http://www.w3.org/2005/Atom}id").text,
+                "arxiv_id": entry.find("{http://www.w3.org/2005/Atom}id").text,
                 "title": entry.find("{http://www.w3.org/2005/Atom}title").text,
+                "abstract": entry.find("{http://www.w3.org/2005/Atom}summary").text,
                 "authors": [author.find("{http://www.w3.org/2005/Atom}name").text for author in entry.findall("{http://www.w3.org/2005/Atom}author")],
-                "summary": entry.find("{http://www.w3.org/2005/Atom}summary").text,
-                "published": entry.find("{http://www.w3.org/2005/Atom}published").text,
-                "updated": entry.find("{http://www.w3.org/2005/Atom}updated").text,
-                "link": entry.find("{http://www.w3.org/2005/Atom}link").get("href"),
-                "pdf_link": entry.find("{http://www.w3.org/2005/Atom}link").get("href").replace("abs", "pdf")
+                "arxiv_url": entry.find("{http://www.w3.org/2005/Atom}link").get("href"),
+                "pdf_url": entry.find("{http://www.w3.org/2005/Atom}link").get("href").replace("abs", "pdf"),
+                "published_date": entry.find("{http://www.w3.org/2005/Atom}published").text,
+                "updated_date": entry.find("{http://www.w3.org/2005/Atom}updated").text,
             }
             entries.append(entry_dict)
         return entries
