@@ -4,7 +4,10 @@ import xml.etree.ElementTree as ET
 
 class ArxivClient:
     def __init__(self):
-        self.client = httpx.AsyncClient(follow_redirects=True)
+        headers = {
+            "User-Agent": "PaperIntelligenceApp/1.0 (Learning Personal Project)"
+        }
+        self.client = httpx.AsyncClient(timeout=30, follow_redirects=True, headers=headers)
     
     def _parse_xml(self, xml_data : str):
         root = ET.fromstring(xml_data)
@@ -25,6 +28,9 @@ class ArxivClient:
     
     async def search(self, query : str, max_results : int = 2):
         response = await self.client.get(f"http://export.arxiv.org/api/query?search_query=all:{query}&start=0&max_results={max_results}")
+        if response.status_code != 200:
+            print(f"Error: {response.status_code}: {response.text}")
+            return []
         return self._parse_xml(response.text)
     
     async def close(self):

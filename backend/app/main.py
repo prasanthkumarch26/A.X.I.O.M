@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 import asyncpg
 
 from app.db.connection import init_db, close_db, get_db
+from app.api.search import router as search_router
 
 
 @asynccontextmanager
@@ -20,6 +21,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+app.include_router(search_router)
 
 
 @app.get("/health")

@@ -1,7 +1,7 @@
 import asyncio
 from app.services.arxiv_client import ArxivClient
 from app.db.connection import init_db, close_db, get_db_pool, get_db
-from app.db.queries import insert_paper
+from app.db.queries import insert_paper, insert_paper_chunk
 
 
 class IngestionService:
@@ -25,7 +25,22 @@ class IngestionService:
         pool = await get_db_pool()
         async with pool.acquire() as conn:
             for paper in papers:
-                await insert_paper(conn, paper)
+                paper_id = await insert_paper(conn, paper)
+
+                if not paper_id:
+                    paper_id = await conn.fetchval(
+                        "SELECT id FROM papers WHERE arxiv_id = $1",
+                        paper["arxiv_id"]
+                    )
+
+                if paper_id:
+                    chunks = [senstance.strip() for senstance in paper["abstract"].split(".") if senstance.strip()]
+                    for i, chunk in enumerate(chunks):
+                        await insert_paper_chunk(conn, {
+                            "paper_id": paper_id,
+                            "chunk_index": i,
+                            "content": chunk
+                        })
         return papers
 
 async def main():

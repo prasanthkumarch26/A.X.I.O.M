@@ -24,6 +24,7 @@ async def insert_paper(conn: asyncpg.Connection, paper: Dict[str, Any]) -> int:
         paper.get("metadata"),
     )
 
+
 async def insert_paper_chunk(conn: asyncpg.Connection, chunk: Dict[str, Any]) -> int:
     """
     Insert a paper chunk into the database.
@@ -41,6 +42,7 @@ async def insert_paper_chunk(conn: asyncpg.Connection, chunk: Dict[str, Any]) ->
         chunk["content"]
     )
 
+
 async def insert_ingestion_log(conn: asyncpg.Connection, log: Dict[str, Any]) -> int:
     """
     Insert an ingestion log into the database.
@@ -56,3 +58,33 @@ async def insert_ingestion_log(conn: asyncpg.Connection, log: Dict[str, Any]) ->
         log["status"],
         log["error_message"]
     )
+
+
+async def search_papers_fts(conn: asyncpg.Connection, query: str, limit: int = 10) -> List[asyncpg.Record]:
+    """
+    Search papers using full-text search.
+    """
+    q = """
+    WITH ranked_chunks AS (
+        SELECT DISTINCT ON (pc.paper_id) 
+            pc.paper_id,
+            pc.content,
+            ts_rank(pc.search_vector, websearch_to_tsquery('english', $1)) as rank
+        FROM paper_chunks pc
+        WHERE pc.search_vector @@ websearch_to_tsquery('english', $1)
+        ORDER BY pc.paper_id, rank DESC
+    )
+    SELECT
+        p.arxiv_id,
+        p.title,
+        p.abstract,
+        p.authors,
+        p.pdf_url,
+        rc.content as matching_chunk,
+        rc.rank
+    FROM papers p
+    JOIN ranked_chunks rc ON p.id = rc.paper_id
+    ORDER BY rc.rank DESC
+    LIMIT $2
+    """
+    return await conn.fetch(q, query, limit)
