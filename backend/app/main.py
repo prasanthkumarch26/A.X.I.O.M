@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from contextlib import asynccontextmanager
 import asyncpg
 
-from app.db.connection import init_db, close_db, get_db
+from app.db.connection import init_db, close_db, get_db, init_redis, close_redis
 from app.api.search import router as search_router
 
 
@@ -10,9 +10,11 @@ from app.api.search import router as search_router
 async def lifespan(app: FastAPI):
     print("System starting up...")
     await init_db()
+    await init_redis()
     yield
     print("System shutting down...")
     await close_db()
+    await close_redis()
 
 
 app = FastAPI(
