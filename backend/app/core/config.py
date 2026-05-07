@@ -37,7 +37,7 @@ class Settings(BaseSettings):
 
     # arXiv
     arxiv_api_url: AnyUrl = "https://export.arxiv.org/api/query"
-    arxiv_retry_delay: int = Field(3, ge=3, le=60)
+    arxiv_retry_delay: float = Field(3.0, ge=3.0, le=60.0)
     arxiv_max_retries: int = Field(3, ge=3, le=10)
     arxiv_default_results: int = Field(100, ge=1, le=1000)
 

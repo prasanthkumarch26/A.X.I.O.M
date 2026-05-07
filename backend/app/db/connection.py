@@ -13,6 +13,8 @@ async def create_pool() -> asyncpg.Pool:
         dsn=str(settings.database_url),
         min_size=settings.db_min_connections,
         max_size=settings.db_max_connections,
+        command_timeout=1.5,
+        timeout=0.5
     )
 
 

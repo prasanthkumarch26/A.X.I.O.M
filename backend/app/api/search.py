@@ -34,19 +34,25 @@ async def search(query: str, conn: asyncpg.Connection = Depends(get_db), limit: 
 @router.get("/cache/search")
 async def search_from_cache(query: str, conn: asyncpg.Connection = Depends(get_db), redis: redis_client.Redis = Depends(get_redis), limit: int = 10):
     try:
-        cache_key = f"search:{query}"
+        cache_key = f"search:{query.lower().strip()}"
         cached_result = await redis.get(cache_key)
 
         if cached_result:
             return json.loads(cached_result)
         else:
-            results = await search_papers_fts(conn, query, limit)
+            results = await asyncio.wait_for(
+                search_papers_fts(conn, query, limit),
+                timeout=1.0
+            )
 
             if not results:
                 service = IngestionService(ArxivClient())
                 await service.ingest_papers(query)
 
-                results = await search_papers_fts(conn, query, limit)
+                results = await asyncio.wait_for(
+                    search_papers_fts(conn, query, limit),
+                    timeout=1.0
+                )
 
             if results:
                 results_dict = [dict(row) for row in results]
@@ -54,5 +60,7 @@ async def search_from_cache(query: str, conn: asyncpg.Connection = Depends(get_d
                 return results_dict
             else:
                 raise HTTPException(status_code=404, detail="Error: No results found")
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Error: Database query timed out. Please try again.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")

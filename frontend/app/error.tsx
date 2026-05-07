@@ -1,29 +1,21 @@
-import PaperCard from "@/components/PaperCard";
+"use client";
+
 import SearchBar from "@/components/SearchBar";
 
-export default async function Home({
-  searchParams,
+export default function Error({
+  error,
+  reset,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  error: Error;
+  reset: () => void;
 }) {
-  const params = await searchParams;
-  const query = params.q;
-  let results = [];
-
-  if (query) {
-    const response = await fetch(
-      `http://127.0.0.1:8000/cache/search?query=${query}`,
-      { cache: "no-store" },
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
-    } else {
-      results = await response.json();
-    }
-  }
+  // Extract status code if present in message
+  const statusMatch = error.message.match(/\d+/);
+  const statusCode = statusMatch ? statusMatch[0] : "Error";
 
   return (
     <main className="min-h-screen flex flex-col px-4 py-6">
+      {/* Header */}
       <div className="flex flex-col items-center text-center mt-4">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold">
           A<span className="text-red-500">.</span>X
@@ -41,12 +33,25 @@ export default async function Home({
         </p>
       </div>
 
-      <div className="flex-1 w-full max-w-2xl mx-auto mt-6 space-y-4">
-        {results.map((paper: any) => (
-          <PaperCard key={paper.arxiv_id} paper={paper} />
-        ))}
+      {/* Error Content */}
+      <div className="flex-1 flex flex-col items-center justify-center text-center">
+        <h1 className="text-6xl sm:text-7xl font-bold text-red-500">
+          {statusCode}
+        </h1>
+
+        <p className="text-gray-400 mt-4 text-sm sm:text-base">
+          Something went wrong while fetching papers.
+        </p>
+
+        <button
+          onClick={() => reset()}
+          className="mt-6 px-5 py-2 rounded-xl border border-gray-700 hover:border-red-500 transition-colors"
+        >
+          Try Again
+        </button>
       </div>
 
+      {/* Bottom Search Bar */}
       <SearchBar />
     </main>
   );

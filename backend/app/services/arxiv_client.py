@@ -1,6 +1,10 @@
 import httpx
 import asyncio
 import xml.etree.ElementTree as ET
+import time
+
+_arxiv_lock = asyncio.Lock()
+_last_request_time: float = 0.0
 
 class ArxivClient:
     def __init__(self):
@@ -27,7 +31,12 @@ class ArxivClient:
         return entries
     
     async def search(self, query : str, max_results : int = 2):
-        response = await self.client.get(f"http://export.arxiv.org/api/query?search_query=all:{query}&start=0&max_results={max_results}")
+        global _last_request_time
+        
+        async with _arxiv_lock:
+            _last_request_time = time.monotonic()
+
+            response = await self.client.get(f"http://export.arxiv.org/api/query?search_query=all:{query}&start=0&max_results={max_results}")
         if response.status_code != 200:
             print(f"Error: {response.status_code}: {response.text}")
             return []
