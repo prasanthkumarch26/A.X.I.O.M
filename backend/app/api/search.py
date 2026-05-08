@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+import asyncio
 import asyncpg
 from app.db.connection import get_db, get_redis
 from app.db.queries import search_papers_fts

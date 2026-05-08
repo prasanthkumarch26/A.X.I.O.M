@@ -22,11 +22,12 @@ class Settings(BaseSettings):
     # Server configuration
     host: str = "0.0.0.0"
     port: int = Field(8000, ge=1024, le=65535)
+    max_concurrent_requests: int = Field(200, ge=10, le=10000)
 
     # Database configuration
     database_url: PostgresDsn
-    db_min_connections: int = Field(5, ge=5, le=100)
-    db_max_connections: int = Field(20, ge=10, le=500)
+    db_min_connections: int = Field(10, ge=5, le=100)
+    db_max_connections: int = Field(30, ge=10, le=500)
 
     # Redis configuration
     redis_url: RedisDsn
