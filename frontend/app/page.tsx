@@ -10,17 +10,18 @@ export default async function Home({
   const query = params.q;
   let results = [];
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   if (query) {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/cache/search?query=${query}`,
-      { cache: "no-store" },
-    );
+    const response = await fetch(`${API_URL}/cache/search?query=${query}`, {
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP Error: ${response.status}`);
-    } else {
-      results = await response.json();
     }
+
+    results = await response.json();
   }
 
   return (
