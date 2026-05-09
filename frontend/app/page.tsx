@@ -12,9 +12,10 @@ export default async function Home({
 
   if (query) {
     const response = await fetch(
-      `http://127.0.0.1:8000/cache/search?query=${query}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/cache/search?query=${query}`,
       { cache: "no-store" },
     );
+
     if (!response.ok) {
       throw new Error(`HTTP Error: ${response.status}`);
     } else {
