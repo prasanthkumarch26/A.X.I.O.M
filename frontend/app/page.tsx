@@ -68,7 +68,7 @@ export default async function Home({
             ))}
           </div>
         ) : (
-          <div className="mt-10 flex flex-col items-center text-center">
+          <div className="mt-12 flex flex-col items-center text-center">
             <h3 className="text-lg font-semibold mb-6 text-gray-200">
               Trending Topics
             </h3>
