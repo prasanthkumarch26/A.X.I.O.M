@@ -11,8 +11,6 @@ export default function SearchBar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log(query);
-
     if (query) {
       router.push(`/?q=${query}`);
     }
