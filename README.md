@@ -140,7 +140,8 @@ npm run dev
 ```
 
 Frontend runs at:
-axiomresearch.vercel.app
+localhost:
+http://localhost:3000/
 
 ---
 
